@@ -12,7 +12,7 @@ class Controller:
 
     def control_motor(self, number, direction, pulse):
         # --- Message values ---
-        MSG_TYPE = 0x01          # Example: MCMD Motor Command
+        MSG_TYPE = 0x01           # Example: MCMD Motor Command
         NUMBER = number           # Motor number
         DIR = direction           # Direction
         PULSE = pulse             # Pulse width
@@ -34,14 +34,14 @@ class Controller:
 
         print("DC command sent!")
         
-    def control_servo(self, number, angle):
+    def control_servo(self, number, pulse):
         # Example for controlling a servo
-        MSG_TYPE = 0x02          # Example: SCMD Servo Command
+        MSG_TYPE = 0x02           # Example: SCMD Servo Command
         NUMBER = number           # Servo number
-        ANGLE = angle             # Angle in degrees
+        PULSE = pulse             # Pulse width
 
-        # Map message bytes MSG_TYPE, NUMBER, ANGLE
-        msg_bytes = struct.pack('<BBH', MSG_TYPE, NUMBER, ANGLE)
+        # Map message bytes MSG_TYPE, NUMBER, PULSE
+        msg_bytes = struct.pack('<BBH', MSG_TYPE, NUMBER, PULSE)
 
         with self.ser as ser:
             print(f"Sending: {[hex(b) for b in msg_bytes]}")
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     controller = Controller(port='/dev/ttyACM0', baudrate=115200)
     
     # Example usage
-    controller.control_motor(number=1, direction=1, pulse=1000)  # Motor 1, forward, 1000ms pulse
-    controller.control_servo(number=1, angle=90)  # Servo 1 to 90 degrees
+    controller.control_motor(number=1, direction=1, pulse=1000)  # Motor 1, forward, 1000 pulse
+    controller.control_servo(number=1, pulse=900) 
