@@ -7,64 +7,125 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+int mapToPulse(int value) {
+	return map(min(100, max(0, value)), 0, 100, 0, 4095);
+}
 // MCMD:
 // MESSAGE_TYPE | NUMBER | DIR | PULSE (2 bytes)
 
 // SCMD:
 // MESSAGE_TYPE | NUMBER | ANGLE (2 bytes)
 
-void onCommand(message_type_t type, const uint8_t* data, size_t length) {
-    if (length < 3) {
-        Serial.println("Invalid command length");
-        return;
+void motorControl(int number, int dir, int pulse) {
+  if (dir == 1) {
+    if (number == 1) {
+      pwm.setPWM(M1_A, 0, 0);
+      pwm.setPWM(M1_B, 0, mapToPulse(pulse));
     }
+    if (number == 2) {
+      pwm.setPWM(M2_A, 0, 0);
+      pwm.setPWM(M2_B, 0, mapToPulse(pulse));
+    }
+    if (number == 3) {
+      pwm.setPWM(M3_A, 0, 0);
+      pwm.setPWM(M3_B, 0, mapToPulse(pulse));
+    }
+    if (number == 4) {
+      pwm.setPWM(M4_A, 0, 0);
+      pwm.setPWM(M4_B, 0, mapToPulse(pulse));
+    }
+  }
+  else if (dir == 0) {
+    if (number == 1) {
+      pwm.setPWM(M1_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M1_B, 0, 0);
+    }
+    if (number == 2) {
+      pwm.setPWM(M2_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M2_B, 0, 0);
+    }
+    if (number == 3) {
+      pwm.setPWM(M3_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M3_B, 0, 0);
+    }
+    if (number == 4) {
+      pwm.setPWM(M4_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M4_B, 0, 0);
+    }
+  }
+}
+void servoControl(int number, int pulse) {
+    if (number == 1){
+        pwm.setPWM(SERVO_1, 0, pulse);
+    }
+    if (number == 2){
+        pwm.setPWM(SERVO_2, 0, pulse);
+    }
+    if (number == 3){
+        pwm.setPWM(SERVO_3, 0, pulse);
+    }
+    if (number == 4){
+        pwm.setPWM(SERVO_4, 0, pulse);
+    }
+}
 
-    if (type == MSG_TYPE_MCMD) {  
-        uint8_t number = data[0];
-        uint8_t dir = data[1];
-        int16_t pulse = data[2] | (data[3] << 8);
+void onCommand(message_type_t type, const uint8_t* data, size_t length) {
+  if (length < 3) {
+    Serial.println("Invalid command length");
+    return;
+  }
 
-        Serial.print("Received MCMD: ");
-        Serial.print("Type = ");        Serial.print(type);
-        Serial.print(", Motor Number = ");
-        Serial.print(number);
-        Serial.print(", Direction = ");
-        Serial.print(dir);
-        Serial.print(", Pulse = ");
-        Serial.println(pulse);
-        
-        // Implement control DC here
-    } else if (type == MSG_TYPE_SCMD) {
-        uint8_t number = data[0];
-        int16_t pulse = data[2] | (data[3] << 8);
+  if (type == MSG_TYPE_MCMD) {
+    uint8_t number = data[0];
+    uint8_t dir = data[1];
+    int16_t pulse = data[2] | (data[3] << 8);
 
-        Serial.print("Received SCMD: ");
-        Serial.print("Type = ");
-        Serial.print(type);
-        Serial.print(", Servo Number = ");
-        Serial.print(number);
-        Serial.print(", Pulse = ");
-        Serial.println(pulse);
+    Serial.print("Received MCMD: ");
+    Serial.print("Type = ");
+    Serial.print(type);
+    Serial.print(", Motor Number = ");
+    Serial.print(number);
+    Serial.print(", Direction = ");
+    Serial.print(dir);
+    Serial.print(", Pulse = ");
+    Serial.println(pulse);
 
-        // Implement control servo here
-    } else {
-        Serial.println("Unknown command type");
-    } 
-    Serial.flush();
+    // Implement control DC here
+    motorControl(number, dir, pulse);
+
+  } else if (type == MSG_TYPE_SCMD) {
+    uint8_t number = data[0];
+    int16_t pulse = data[1] | (data[2] << 8);
+
+    Serial.print("Received SCMD: ");
+    Serial.print("Type = ");
+    Serial.print(type);
+    Serial.print(", Servo Number = ");
+    Serial.print(number);
+    Serial.print(", Pulse = ");
+    Serial.println(pulse);
+
+
+    // Implement control servo here
+    servoControl(number, pulse);
+  } else {
+    Serial.println("Unknown command type");
+  }
+  Serial.flush();
 }
 
 CommandListener cmdListener;
 
 void setup() {
-    cmdListener.begin();
-    cmdListener.setHandler(onCommand);
+  cmdListener.begin();
+  cmdListener.setHandler(onCommand);
 
-    pwm.begin();
-    pwm.setOscillatorFrequency(27000000);
-    pwm.setPWMFreq(50);
+  pwm.begin();
+  pwm.setOscillatorFrequency(27000000);
+  pwm.setPWMFreq(50);
 }
 
 void loop() {
-    cmdListener.listen();
-    delay(50);
+  cmdListener.listen();
+  delay(50);
 }
