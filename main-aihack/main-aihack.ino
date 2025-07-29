@@ -34,8 +34,8 @@ void onCommand(message_type_t type, const uint8_t* data, size_t length) {
         Serial.println(pulse);
         
         // Implement control DC here
-    } else if () {
-        unit8_t number = data[0];
+    } else if (type == MSG_TYPE_SCMD) {
+        uint8_t number = data[0];
         int16_t pulse = data[2] | (data[3] << 8);
 
         Serial.print("Received SCMD: ");
