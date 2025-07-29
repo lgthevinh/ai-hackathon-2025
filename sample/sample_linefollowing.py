@@ -1,21 +1,17 @@
-import gpiod
-import time
+from gpiozero import DigitalInputDevice
+from time import sleep
 
-# Change to your correct GPIO chip - usually "gpiochip0" on Pi 5
-CHIP = "gpiochip0"
-SENSOR_LINES = [17, 18, 27, 22, 23]  # BCM numbering
+# Define GPIO pins for your five sensors
+sensor_pins = [5, 6, 13, 19, 26]  # Example pins, update as needed
 
-# Open chip and request lines as inputs
-chip = gpiod.Chip(CHIP)
-lines = chip.get_lines(SENSOR_LINES)
-lines.request(consumer="line_following", type=gpiod.LINE_REQ_DIR_IN)
+# Create DigitalInputDevice objects for each sensor
+sensors = [DigitalInputDevice(pin) for pin in sensor_pins]
 
+print("Reading 5 line sensors. Press Ctrl+C to exit.")
 try:
     while True:
-        sensor_states = lines.get_values()
-        print("Sensor states:", sensor_states)
-        time.sleep(0.1)
+        values = [sensor.value for sensor in sensors]
+        print("Sensor values:", values)
+        sleep(0.1)
 except KeyboardInterrupt:
-    print("Exiting.")
-finally:
-    lines.release()
+    print("Stopped.")
