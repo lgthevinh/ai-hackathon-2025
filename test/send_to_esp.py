@@ -10,11 +10,11 @@ BAUDRATE = 115200
 # --- Message values ---
 MSG_TYPE = 0x01          # Example: MCMD
 NUMBER = 0x07
-PULSE = 0x0100  # Example: 4000 in decimal
+DIR = 0x01           # Example: Direction (0 for forward, 1 for backward)
+PULSE = 0x0FA0  # Example: 4000 in decimal
 
-# --- Compose message ---
-# struct.pack with '<BBH' means: little-endian, 1 byte (MSG_TYPE), 1 byte (NUMBER), 2 bytes (PULSE)
-msg_bytes = struct.pack('<BBH', MSG_TYPE, NUMBER, PULSE)
+# Map message bytes MSG_TYPE, NUMBER, DIR, PULSE
+msg_bytes = struct.pack('<BBBH', MSG_TYPE, NUMBER, DIR, PULSE)
 
 # --- Send over serial ---
 with serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1) as ser:
@@ -26,18 +26,18 @@ with serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1) as ser:
     if ser.in_waiting:
         response = ser.read(ser.in_waiting)
         
-        print("Received response:", [hex(b) for b in response])
-        if len(response) > 0:
-            print("Response length:", len(response))
-            if len(response) >= 4:
-                msg_type, number, pulse = struct.unpack('<BBH', response[:4])
-                print(f"Parsed - Type: {msg_type}, Number: {number}, Pulse: {pulse}")
-            else:
-                print("Response too short to parse")
+        # print("Received response:", [hex(b) for b in response])
+        # if len(response) > 0:
+        #     print("Response length:", len(response))
+        #     if len(response) >= 4:
+        #         msg_type, number, pulse = struct.unpack('<BBH', response[:4])
+        #         print(f"Parsed - Type: {msg_type}, Number: {number}, Pulse: {pulse}")
+        #     else:
+        #         print("Response too short to parse")
         
-        print("Response from ESP:", response.hex())
+        # print("Response from ESP:", response.hex())
         
         ascii_str = binascii.unhexlify(response.hex()).decode()
-        print(ascii_str)
+        print("Response from ESP:", ascii_str)
 
 print("Test message sent!")

@@ -7,10 +7,32 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+// MCMD:
+// MESSAGE_TYPE | NUMBER | DIR | PULSE (2 bytes)
+
 void onCommand(message_type_t type, const uint8_t* data, size_t length) {
+    if (length < 3) {
+        Serial.println("Invalid command length");
+        return;
+    }
+
     if (type == MSG_TYPE_MCMD) {  
-        pwm.setPin(15, 4000);
-        Serial.print(0x01);
+        
+        uint8_t number = data[0];
+        uint8_t dir = data[1]; // Direction, not used in this example
+        int16_t pulse = data[2] | (data[3] << 8) ; // Combine two bytes into one int16_t
+
+        Serial.print("Received MCMD: ");
+        Serial.print("Type = ");        Serial.print(type);
+        Serial.print(", Number = ");
+        Serial.print(number);
+        Serial.print(", Direction = ");
+        Serial.print(dir);
+        Serial.print(", Pulse = ");
+        Serial.println(pulse);
+        
+    } else {
+        Serial.println("Unknown command type");
     } 
     Serial.flush();
 }
