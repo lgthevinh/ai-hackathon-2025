@@ -7,9 +7,6 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-int mapToPulse(int value) {
-	return map(min(100, max(0, value)), 0, 100, 0, 4095);
-}
 // MCMD:
 // MESSAGE_TYPE | NUMBER | DIR | PULSE (2 bytes)
 
@@ -20,36 +17,36 @@ void motorControl(int number, int dir, int pulse) {
   if (dir == 1) {
     if (number == 1) {
       pwm.setPWM(M1_A, 0, 0);
-      pwm.setPWM(M1_B, 0, mapToPulse(pulse));
+      pwm.setPWM(M1_B, 0, pulse);
     }
     if (number == 2) {
       pwm.setPWM(M2_A, 0, 0);
-      pwm.setPWM(M2_B, 0, mapToPulse(pulse));
+      pwm.setPWM(M2_B, 0, pulse);
     }
     if (number == 3) {
       pwm.setPWM(M3_A, 0, 0);
-      pwm.setPWM(M3_B, 0, mapToPulse(pulse));
+      pwm.setPWM(M3_B, 0, pulse);
     }
     if (number == 4) {
       pwm.setPWM(M4_A, 0, 0);
-      pwm.setPWM(M4_B, 0, mapToPulse(pulse));
+      pwm.setPWM(M4_B, 0, pulse);
     }
   }
   else if (dir == 0) {
     if (number == 1) {
-      pwm.setPWM(M1_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M1_A, 0, pulse);
       pwm.setPWM(M1_B, 0, 0);
     }
     if (number == 2) {
-      pwm.setPWM(M2_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M2_A, 0, pulse);
       pwm.setPWM(M2_B, 0, 0);
     }
     if (number == 3) {
-      pwm.setPWM(M3_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M3_A, 0, pulse);
       pwm.setPWM(M3_B, 0, 0);
     }
     if (number == 4) {
-      pwm.setPWM(M4_A, 0, mapToPulse(pulse));
+      pwm.setPWM(M4_A, 0, pulse);
       pwm.setPWM(M4_B, 0, 0);
     }
   }
@@ -80,16 +77,7 @@ void onCommand(message_type_t type, const uint8_t* data, size_t length) {
     uint8_t dir = data[1];
     int16_t pulse = data[2] | (data[3] << 8);
 
-    Serial.print("Received MCMD: ");
-    Serial.print("Type = ");
-    Serial.print(type);
-    Serial.print(", Motor Number = ");
-    Serial.print(number);
-    Serial.print(", Direction = ");
-    Serial.print(dir);
-    Serial.print(", Pulse = ");
-    Serial.println(pulse);
-
+    Serial.printf("Received MCMD: Type = %d, Motor Number = %d, Direction = %d, Pulse = %d\n", type, number, dir, pulse);
     // Implement control DC here
     motorControl(number, dir, pulse);
 
@@ -97,15 +85,7 @@ void onCommand(message_type_t type, const uint8_t* data, size_t length) {
     uint8_t number = data[0];
     int16_t pulse = data[1] | (data[2] << 8);
 
-    Serial.print("Received SCMD: ");
-    Serial.print("Type = ");
-    Serial.print(type);
-    Serial.print(", Servo Number = ");
-    Serial.print(number);
-    Serial.print(", Pulse = ");
-    Serial.println(pulse);
-
-
+    Serial.printf("Received SCMD: Type = %d, Servo Number = %d, Pulse = %d\n", type, number, pulse);
     // Implement control servo here
     servoControl(number, pulse);
   } else {
