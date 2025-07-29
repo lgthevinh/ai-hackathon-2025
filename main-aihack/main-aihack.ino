@@ -10,6 +10,9 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 // MCMD:
 // MESSAGE_TYPE | NUMBER | DIR | PULSE (2 bytes)
 
+// SCMD:
+// MESSAGE_TYPE | NUMBER | ANGLE (2 bytes)
+
 void onCommand(message_type_t type, const uint8_t* data, size_t length) {
     if (length < 3) {
         Serial.println("Invalid command length");
@@ -17,20 +20,33 @@ void onCommand(message_type_t type, const uint8_t* data, size_t length) {
     }
 
     if (type == MSG_TYPE_MCMD) {  
-        
         uint8_t number = data[0];
-        uint8_t dir = data[1]; // Direction, not used in this example
-        int16_t pulse = data[2] | (data[3] << 8) ; // Combine two bytes into one int16_t
+        uint8_t dir = data[1];
+        int16_t pulse = data[2] | (data[3] << 8);
 
         Serial.print("Received MCMD: ");
         Serial.print("Type = ");        Serial.print(type);
-        Serial.print(", Number = ");
+        Serial.print(", Motor Number = ");
         Serial.print(number);
         Serial.print(", Direction = ");
         Serial.print(dir);
         Serial.print(", Pulse = ");
         Serial.println(pulse);
         
+        // Implement control DC here
+    } else if () {
+        unit8_t number = data[0];
+        int16_t pulse = data[2] | (data[3] << 8);
+
+        Serial.print("Received SCMD: ");
+        Serial.print("Type = ");
+        Serial.print(type);
+        Serial.print(", Servo Number = ");
+        Serial.print(number);
+        Serial.print(", Pulse = ");
+        Serial.println(pulse);
+
+        // Implement control servo here
     } else {
         Serial.println("Unknown command type");
     } 

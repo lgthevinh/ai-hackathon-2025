@@ -9,7 +9,7 @@ BAUDRATE = 115200
 
 # --- Message values ---
 MSG_TYPE = 0x01          # Example: MCMD
-NUMBER = 0x07
+NUMBER = 0x04
 DIR = 0x01           # Example: Direction (0 for forward, 1 for backward)
 PULSE = 0x0FA0  # Example: 4000 in decimal
 
