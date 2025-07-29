@@ -1,22 +1,18 @@
+#include <Adafruit_PWMServoDriver.h>
+
 #include <Arduino.h>
 
 #include "robot_types.h"
 #include "CommandListener.h"
 
-void onCommand(message_type_t type, const uint8_t* data, size_t length) {
-    Serial.print("Type: ");
-    Serial.println(type, HEX);
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-    Serial.print("Data: ");
-    for (size_t i = 0; i < length; ++i) {
-        Serial.print(data[i], HEX);
-        Serial.print(" ");
-    }
-    Serial.println();
-    
+void onCommand(message_type_t type, const uint8_t* data, size_t length) {
     if (type == MSG_TYPE_MCMD) {  
-        Serial.println("TEST");
+        pwm.setPin(15, 4000);
+        Serial.print(0x01);
     } 
+    Serial.flush();
 }
 
 CommandListener cmdListener;
@@ -24,6 +20,10 @@ CommandListener cmdListener;
 void setup() {
     cmdListener.begin();
     cmdListener.setHandler(onCommand);
+
+    pwm.begin();
+    pwm.setOscillatorFrequency(27000000);
+    pwm.setPWMFreq(50);
 }
 
 void loop() {
