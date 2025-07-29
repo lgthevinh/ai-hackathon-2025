@@ -1,16 +1,22 @@
-from time import sleep
-from mfrc522 import SimpleMFRC522
+import spidev
+import time
 
-reader = SimpleMFRC522()
+try:
+    from rc522spi import RC522
+except ImportError:
+    print("Install the rc522spi library: pip install rc522spi")
+    exit(1)
 
-## Set string value to buffer
+# Initialize RC522 SPI, RST pin is not required for basic reads if tied high
+reader = RC522()
+
+print("Place your RFID card near the RC522 reader...")
+
 try:
     while True:
-        id, text = reader.read()
-        
-        print(f"ID: {id}, Text: {text}")
-             
-        sleep(1)
+        id = reader.read_id()
+        if id:
+            print(f"Tag detected! UID: {id}")
+        time.sleep(0.5)
 except KeyboardInterrupt:
-    GPIO.cleanup()
-    raise
+    print("Exiting RFID reader.")
