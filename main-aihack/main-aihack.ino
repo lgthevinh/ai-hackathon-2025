@@ -1,23 +1,22 @@
 #include <Arduino.h>
-#include "LineFollowing.h"
 
-const uint8_t lineSensorPins[5] = {0, 1, 4, 5, 8}; // define Line following sensor pins out here in-order
-LineFollowing lineFollower(lineSensorPins);
+#include "robot_types.h"
+#include "CommandListener.h"
+
+void onCommand(message_type_t type, const uint8_t* data, size_t length) {
+    if (type == MSG_TYPE_MCMD) {  
+        
+    } 
+}
+
+CommandListener cmdListener(Serial1);
 
 void setup() {
-    Serial.begin(115200);
-    lineFollower.begin();
+    cmdListener.begin();
+    cmdListener.setHandler(onCommand);
 }
 
 void loop() {
-    lineFollower.readSensors();
-    uint8_t lineBits = lineFollower.getSensorBits();
-    Serial.print("Sensor bits: 0b");
-    for (int i = 4; i >= 0; --i) {
-        Serial.print((lineBits >> i) & 1);
-    }
-    Serial.println();
-    // Send lineBits via UART
-    Serial.write(lineBits);
-    delay(100);
+    cmdListener.listen();
+    delay(50);
 }
